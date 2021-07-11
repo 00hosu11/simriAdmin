@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="communitySQL">
+	
+	<select id="getCommunity" parameterType="java.util.Map" resultType="community">
+		select * from (select rownum rn, tt.*from 
+		(select * from community where category=#{comCategory} order by comlogtime desc, seq desc)tt 
+		)where rn<![CDATA[ >= ]]>#{startNum}
+		 and rn <![CDATA[ <= ]]>#{endNum}
+	</select>
+	
+	<select id="getComPalette" parameterType="java.util.Map" resultType="community">
+		select * from (select rownum rn, tt.*from 
+		(select * from community where category like '%팔레트%' order by comlogtime desc, seq desc)tt 
+		)where rn<![CDATA[ >= ]]>#{startNum}
+		 and rn <![CDATA[ <= ]]>#{endNum}
+	</select>
+
+	<select id="singoList" parameterType="java.util.Map" resultType="community">
+		select * from (select rownum rn, tt.*from 
+		(select * from community where category=#{comCategory} and comsingo > 0 order by comlogtime desc, seq desc)tt 
+		)where rn<![CDATA[ >= ]]>#{startNum}
+		 and rn <![CDATA[ <= ]]>#{endNum}
+	</select>
+	
+	<select id="singoReplyList" parameterType="java.util.Map" resultType="reply">
+		
+		select * from (select rownum rn, tt.*from 
+		(select * from reply where replysingo>0
+		order by case when replycomment in('[신고된 댓글입니다.]') then '[]' else '' end desc
+		, replylogtime desc)tt 
+		)where rn<![CDATA[ >= ]]>#{startNum}
+		 and rn <![CDATA[ <= ]]>#{endNum}
+		
+	</select>
+	
+	<select id="getReplyTotalA" parameterType="java.util.Map" resultType="int">
+		select count(*) from reply where replysingo>0
+	</select>
+	
+	<select id="singoComPalette" parameterType="java.util.Map" resultType="community">
+		select * from (select rownum rn, tt.*from 
+		(select * from community where category like '%팔레트%' and comsingo > 0 order by comlogtime desc, seq desc)tt 
+		)where rn<![CDATA[ >= ]]>#{startNum}
+		 and rn <![CDATA[ <= ]]>#{endNum}
+	</select>
+
+	<delete id="communityDelete" parameterType="int">
+		delete community where seq=#{seq}
+	</delete>
+	
+	<select id="getTotalA" parameterType="java.util.Map" resultType="int">
+		select count(*) from community where category=#{comCategory}
+	</select>
+	
+	<select id="getTotalB" parameterType="java.util.Map" resultType="int">
+		select count(*) from community  where category like '%팔레트%'
+	</select>
+	
+	<select id="getSingoTotalA" parameterType="java.util.Map" resultType="int">
+		select count(*) from community where category=#{comCategory} and comsingo > 0
+	</select>
+	
+	<select id="getSingoTotalB" parameterType="java.util.Map" resultType="int">
+		select count(*) from community  where category like '%팔레트%' and comsingo > 0
+	</select>
+	
+	<insert id="noticeWrite" parameterType="community">
+      insert into community(category, seq, email, nickname, palette, subject, content, testURL, comLogtime, image, hashTag1, hashTag2, hashTag3, hit, comLike, comSingo, comSingoReason, comShare, point, reply)
+       values('[공지사항]', 
+       			seq.nextval, 
+       			'admin@gmail.com', 
+       			'admin', 
+       			'rainbow', 
+       			#{subject}, 
+       			#{content}, 
+       			'notice',
+       			sysdate, 
+       			#{image}, 
+       			'#공지사항',
+       			'', 
+       			'', 
+       			0, 
+       			0, 
+       			0, 
+       			'', 
+       			0, 
+       			0, 
+       			0)
+   </insert>
+	
+	<select id="getCommunityView" parameterType="int" resultType="community">
+		select * from community where seq=#{seq}
+	</select>
+	
+	<select id="getComSearch" parameterType="java.util.Map" resultType="community">
+	select * from (select rownum rn, tt.*from 
+		(select * from community where nickname like '%'||#{comSearchText}||'%' order by comlogtime desc, seq desc)tt 
+		)where rn<![CDATA[ >= ]]>#{startNum}
+		 and rn <![CDATA[ <= ]]>#{endNum}
+		 
+	</select>
+	
+	<select id="getSearchTotalA" parameterType="String" resultType="int">
+		select count(*) from community where nickname like '%'||#{comSearchText}||'%'
+	</select>
+	
+	<update id="viewModify" parameterType="community">
+		update community set subject = #{subject}, content = #{content}, comlogtime = sysdate, image = #{image}, testurl =#{testURL}  where seq=#{seq}
+	</update>
+	
+	<update id="replyDelete" parameterType="int">
+		update reply set replycomment='[신고된 댓글입니다.]'  where replyseq=#{seq}
+	</update>
+	
+	
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
