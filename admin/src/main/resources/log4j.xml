@@ -11,7 +11,7 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="com.mvc.simri">
+	<logger name="com.admin.simri">
 		<level value="info" />
 	</logger>
 	
